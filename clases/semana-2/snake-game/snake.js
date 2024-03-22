@@ -19,8 +19,8 @@ class Snake {
   update() {
     let head = this.body[this.body.length-1].copy(); // Copia la posición actual de la cabeza.
     this.body.shift(); // Elimina el segmento más antiguo del cuerpo.
-    head.x += this.xdir; // Mueve la cabeza en el eje X.
-    head.y += this.ydir; // Mueve la cabeza en el eje Y.
+    head.x += this.xdir * 20; // Mueve la cabeza en el eje X.
+    head.y += this.ydir * 20; // Mueve la cabeza en el eje Y.
     this.body.push(head); // Añade la nueva posición de la cabeza al cuerpo.
   }
   
@@ -66,7 +66,7 @@ class Snake {
       for(let i = 0; i < this.body.length; i++) {
         fill(0); // Color de relleno para la serpiente.
         noStroke(); // Sin borde para los segmentos.
-        rect(this.body[i].x, this.body[i].y, 1, 1); // Dibuja cada segmento del cuerpo.
+        rect(this.body[i].x, this.body[i].y, 20, 20); // Dibuja cada segmento del cuerpo.
     }
   }
 }

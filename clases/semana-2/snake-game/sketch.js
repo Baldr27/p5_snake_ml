@@ -1,18 +1,53 @@
 // Variables globales para la serpiente, resolución de la cuadrícula, comida, y dimensiones de la cuadrícula.
 let snake;
-let rez = 20; // Factor de resolución para escalar todo el juego.
+let rez = 1; // Factor de resolución para escalar todo el juego.
 let food;
 let w; // Ancho del campo de juego en "unidades" de juego, no en píxeles.
 let h; // Altura del campo de juego en "unidades" de juego, no en píxeles.
+let video;
+let classifier;
+let model = "https://teachablemachine.withgoogle.com/models/-wjKXpgHp/";
+
+function preload(){
+  classifier = ml5.imageClassifier(model);
+}
 
 // Función de configuración inicial para p5.js, se llama una vez al inicio.
 function setup() {
-  createCanvas(400, 400); // Crea un lienzo de 400x400 píxeles.
+  createCanvas(720, 480); // Crea un lienzo de 400x400 píxeles.
   w = floor(width / rez); // Calcula el ancho del campo de juego en unidades de juego.
   h = floor(height / rez); // Calcula la altura del campo de juego en unidades de juego.
   frameRate(5); // Establece la velocidad del juego a 5 cuadros por segundo.
   snake = new Snake(); // Crea una nueva instancia de la serpiente.
   foodLocation(); // Coloca la comida en una ubicación inicial aleatoria.
+
+  video = createCapture(VIDEO);
+  video.hide();
+  classifyVideo();
+}
+
+function classifyVideo(){
+  classifier.classify(video, gotResults);
+}
+
+function gotResults(error, results){
+  if(error){
+    console.error(error);
+    return;
+  }
+  console.log(results);
+
+  if(results[0].label === "Up"){
+    snake.setDir(0, -1); // Mueve hacia arriba.
+  }else if(results[0].label === "Down"){
+    snake.setDir(0, 1); // Mueve hacia abajo.
+  }else if(results[0].label === "Left"){
+    snake.setDir(-1, 0); // Mueve hacia la izquierda.
+  }else if(results[0].label === "Right"){
+    snake.setDir(1, 0); // Mueve hacia la derecha.
+  }
+
+  classifyVideo();
 }
 
 // Genera una nueva ubicación para la comida en el campo de juego.
@@ -41,7 +76,10 @@ function keyPressed() {
 // Función de dibujo que p5.js llama en bucle para animar el juego.
 function draw() {
   scale(rez); // Escala todo el dibujo por el factor de resolución.
-  background(220); // Establece el color de fondo del lienzo.
+  background(0); // Establece el color de fondo del lienzo.
+  translate(video.width, 0);
+  scale(-1, 1);
+  image(video, 0, 0);
   if (snake.eat(food)) {
     foodLocation(); // Si la serpiente come la comida, genera una nueva ubicación para la comida.
   }
@@ -58,5 +96,5 @@ function draw() {
   // Dibuja la comida en el campo de juego.
   noStroke(); // No dibuja bordes para la comida.
   fill(255, 0, 0); // Establece el color de la comida a rojo.
-  rect(food.x, food.y, 1, 1); // Dibuja la comida como un cuadrado.
+  rect(food.x, food.y, 20, 20); // Dibuja la comida como un cuadrado.
 }
